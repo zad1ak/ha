@@ -1,0 +1,52 @@
+blueprint:
+  name: "Quiet Mode Executor"
+  description: >
+    Реальный запуск "Тихого режима": управление громкостью устройств, уведомлениями, светом и охраной.
+  domain: automation
+  input:
+    quiet_devices:
+      name: "Группа устройств для тихого режима"
+      description: "Устройства, на которые будет влиять тихий режим"
+      selector:
+        entity:
+          domain: group
+    use_percent:
+      name: "Использовать проценты"
+      description: "Если true, берём volume_percent, иначе volume_level"
+      default: true
+      selector:
+        boolean: {}
+    volume_percent:
+      name: "Громкость в процентах"
+      description: "Если use_percent=true"
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 100
+          step: 1
+    volume_level:
+      name: "Громкость уровня 0–1"
+      description: "Если use_percent=false"
+      default: 0.1
+      selector:
+        number:
+          min: 0.0
+          max: 1.0
+          step: 0.01
+trigger:
+  - platform: homeassistant
+    event: quiet_mode_start
+action:
+  - variables:
+      target_volume: >
+        {% if input.use_percent %}
+          {{ input.volume_percent / 100 }}
+        {% else %}
+          {{ input.volume_level }}
+        {% endif %}
+  - service: media_player.volume_set
+    target:
+      entity_id: !input quiet_devices
+    data:
+      volume_level: "{{ target_volume }}"

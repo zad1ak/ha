@@ -1,0 +1,21 @@
+blueprint:
+  name: "Doorbell Handler Template"
+  description: >
+    Шаблон для обработки домофона. Отправляет уведомления на Android/Telegram
+    и позволяет выбрать "Открыть" или "Не открывать".
+  domain: automation
+  input:
+    doorbell_sensor:
+      name: "Датчик звонка"
+      selector:
+        entity:
+          domain: binary_sensor
+    android_device:
+      name: "Android устройство"
+      selector:
+        device:
+          integration: mobile_app
+    telegram_chat_id:
+      name: "Telegram Chat ID"
+      selector:
+        text: {}

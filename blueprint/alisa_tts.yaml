@@ -1,0 +1,23 @@
+blueprint:
+  name: "Quiet Mode Alisa TTS"
+  description: "Отправка голосового уведомления на Яндекс Алису о тихом режиме"
+  domain: automation
+  input:
+    alisa_station:
+      name: "Станция Яндекс Алиса"
+      selector:
+        entity:
+          domain: media_player
+    tts_text:
+      name: "Текст для озвучки"
+      selector:
+        text: {}
+trigger:
+  - platform: homeassistant
+    event: quiet_mode_start
+action:
+  - service: yandex_station.send_tts
+    target:
+      entity_id: !input alisa_station
+    data:
+      message: !input tts_text
