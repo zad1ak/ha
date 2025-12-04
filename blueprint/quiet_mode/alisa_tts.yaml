@@ -1,23 +1,82 @@
 blueprint:
-  name: "Quiet Mode Alisa TTS"
-  description: "Отправка голосового уведомления на Яндекс Алису о тихом режиме"
+  name: Quiet Mode – Alice TTS
+  description: >
+    Дополнительный Blueprint для озвучки уведомлений колонками Алисы.
+    Используется вместе с Quiet Mode Trigger.
   domain: automation
+
   input:
-    alisa_station:
-      name: "Станция Яндекс Алиса"
+
+    # Аудио-устройства Алисы
+    alice_devices:
+      name: Колонки Алисы
+      description: "Выберите устройства Яндекс Станции"
       selector:
         entity:
           domain: media_player
+          integration: yandex_station
+          multiple: true
+
+    # Текст для озвучки
     tts_text:
-      name: "Текст для озвучки"
+      name: Текст озвучки
+      description: "Фраза, которую Алиса должна произнести"
       selector:
         text: {}
+      default: "Тихий режим активируется. Подтвердите действие."
+
+    # Скорость речи
+    tts_rate:
+      name: Скорость речи
+      description: "1.0 — нормальная скорость"
+      selector:
+        number:
+          min: 0.5
+          max: 2.0
+          step: 0.1
+      default: 1.0
+
+    # Громкость воспроизведения
+    tts_volume:
+      name: Громкость озвучки
+      selector:
+        number:
+          min: 0.1
+          max: 1.0
+          step: 0.05
+      default: 0.6
+
+# ============================================================
+#                         ТРИГГЕР
+# ============================================================
 trigger:
-  - platform: homeassistant
-    event: quiet_mode_start
+  - platform: event
+    event_type: quiet_mode_alice_tts
+    id: tts
+
+# ============================================================
+#                        ПЕРЕМЕННЫЕ
+# ============================================================
+variables:
+  alice_devices: !input alice_devices
+  tts_text: !input tts_text
+  tts_rate: !input tts_rate
+  tts_volume: !input tts_volume
+
+# ============================================================
+#                         ДЕЙСТВИЯ
+# ============================================================
 action:
-  - service: yandex_station.send_tts
+
+  - service: yandex_station.send_command
     target:
-      entity_id: !input alisa_station
+      entity_id: "{{ alice_devices }}"
     data:
-      message: !input tts_text
+      command: tts
+      text: "{{ tts_text }}"
+      options:
+        rate: "{{ tts_rate }}"
+        volume: "{{ tts_volume }}"
+
+mode: parallel
+max_exceeded: silent
