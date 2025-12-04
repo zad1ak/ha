@@ -1,21 +1,169 @@
 blueprint:
-  name: "Doorbell Handler Template"
+  name: Quiet Mode – Doorbell Handler
   description: >
-    Шаблон для обработки домофона. Отправляет уведомления на Android/Telegram
-    и позволяет выбрать "Открыть" или "Не открывать".
+    Обработчик входящего звонка домофона с уведомлением, кнопками и подавлением
+    звука в тихом режиме. Поддерживает любое оборудование.
   domain: automation
+
   input:
+
+    # ----------------------------------------------------------
+    #                НАСТРОЙКИ ДОМОФОНА
+    # ----------------------------------------------------------
     doorbell_sensor:
-      name: "Датчик звонка"
+      name: Сенсор входящего звонка
+      description: "Сенсор, который меняет состояние при звонке"
       selector:
-        entity:
-          domain: binary_sensor
-    android_device:
-      name: "Android устройство"
-      selector:
-        device:
-          integration: mobile_app
-    telegram_chat_id:
-      name: "Telegram Chat ID"
+        entity: {}
+
+    door_unlock_service:
+      name: Сервис открытия двери
+      description: "Например: script.open_door или lock.open"
       selector:
         text: {}
+
+    doorbell_silent_switch:
+      name: Переключатель тихого режима домофона
+      description: "Если включен — домофон не звонит"
+      selector:
+        entity:
+          domain: switch
+      default: ""
+
+    # ----------------------------------------------------------
+    #               УВЕДОМЛЕНИЯ ANDROID И TELEGRAM
+    # ----------------------------------------------------------
+    android_device:
+      name: Android устройство
+      selector:
+        entity:
+          integration: mobile_app
+
+    telegram_chat_id:
+      name: Telegram Chat ID
+      selector:
+        text: {}
+
+    notify_text:
+      name: Текст уведомления
+      selector:
+        text: {}
+      default: "К вам пришли. Открыть дверь?"
+
+# ============================================================
+#                           ТРИГГЕР
+# ============================================================
+trigger:
+  # Срабатывает при звонке
+  - platform: state
+    entity_id: !input doorbell_sensor
+    to: "on"
+    id: call
+
+# ============================================================
+#                           ПЕРЕМЕННЫЕ
+# ============================================================
+variables:
+  android_device: !input android_device
+  telegram_chat_id: !input telegram_chat_id
+  door_unlock_service: !input door_unlock_service
+  notify_text: !input notify_text
+  doorbell_silent_switch: !input doorbell_silent_switch
+
+# ============================================================
+#                           ДЕЙСТВИЯ
+# ============================================================
+action:
+
+  # В тихом режиме отключаем звук домофона
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: quiet_mode_active
+            state: "on"
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ doorbell_silent_switch != '' }}"
+                sequence:
+                  - service: switch.turn_on
+                    target:
+                      entity_id: "{{ doorbell_silent_switch }}"
+
+  # Telegram — сообщение с кнопками
+  - service: telegram_bot.send_message
+    data:
+      chat_id: "{{ telegram_chat_id }}"
+      message: "{{ notify_text }}"
+      reply_markup:
+        inline_keyboard:
+          - - text: "Открыть дверь"
+              callback_data: "door_open"
+            - text: "Игнорировать"
+              callback_data: "door_ignore"
+
+  # Android push
+  - service: notify.mobile_app_{{ android_device.split('.')[1] }}
+    data:
+      title: "Домофон"
+      message: "{{ notify_text }}"
+      data:
+        actions:
+          - action: "DOOR_OPEN"
+            title: "Открыть дверь"
+          - action: "IGNORE"
+            title: "Игнорировать"
+
+# ============================================================
+#                       ОБРАБОТКА ОТВЕТОВ
+# ============================================================
+mode: parallel
+max_exceeded: silent
+
+# ------------------------------------------------------------
+# Секция обработки внешних событий (Telegram и Android)
+# ------------------------------------------------------------
+
+# 1. Ответ из Telegram
+- alias: "Doorbell Telegram Answer"
+  trigger:
+    - platform: event
+      event_type: telegram_callback
+  condition:
+    - condition: template
+      value_template: >
+        {{ trigger.event.data.data in ['door_open', 'door_ignore'] }}
+  action:
+    - choose:
+        # Пользователь выбрал "Открыть"
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.event.data.data == 'door_open' }}"
+          sequence:
+            - service: "{{ door_unlock_service }}"
+        # Игнорировать → ничего не делаем
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.event.data.data == 'door_ignore' }}"
+          sequence: []
+
+# 2. Ответ из Android Push
+- alias: "Doorbell Android Answer"
+  trigger:
+    - platform: event
+      event_type: mobile_app_notification_action
+  condition: >
+    {{ trigger.event.data.action in ['DOOR_OPEN', 'IGNORE'] }}
+  action:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.event.data.action == 'DOOR_OPEN' }}"
+          sequence:
+            - service: "{{ door_unlock_service }}"
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.event.data.action == 'IGNORE' }}"
+          sequence: []
+
