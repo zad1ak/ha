@@ -1,0 +1,119 @@
+blueprint:
+  name: Alexa TTS – Уведомления
+  description: >
+    Универсальный обработчик голосовых уведомлений через Alexa.
+    Поддерживает выбор устройства, громкость, шаблоны текста и разные триггеры.
+  domain: automation
+
+  input:
+
+    trigger_event:
+      name: Триггер события
+      description: "Например: датчик движения, кнопка, звонок домофона"
+      selector:
+        entity: {}
+
+    alexa_device:
+      name: Alexa устройство
+      selector:
+        entity:
+          integration: alexa_media
+
+    message_text:
+      name: Текст сообщения
+      description: "Используется TTS. Можно шаблонизировать."
+      selector:
+        text: {}
+      default: "Внимание. Обнаружено событие."
+
+    language:
+      name: Язык TTS
+      default: "ru-RU"
+      selector:
+        select:
+          options:
+            - ru-RU
+            - en-US
+            - de-DE
+            - fr-FR
+            - it-IT
+            - es-ES
+
+    volume_level:
+      name: Громкость уведомления
+      description: "Громкость (0–1). Если не указано — не изменяется."
+      default: 0.6
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.05
+          mode: slider
+
+    restore_volume:
+      name: Восстановить прежнюю громкость после озвучки
+      default: true
+      selector:
+        boolean: {}
+
+# ======================================================================
+#                                TRIGGER
+# ======================================================================
+trigger:
+  - platform: state
+    entity_id: !input trigger_event
+    to: "on"
+
+# ======================================================================
+#                                ACTIONS
+# ======================================================================
+variables:
+  alexa_device: !input alexa_device
+  volume: !input volume_level
+  language: !input language
+  restore_volume: !input restore_volume
+
+action:
+  - variables:
+      notify_entity: "notify.alexa_media_{{ alexa_device.split('.')[1] }}"
+
+  # Сохраняем текущую громкость
+  - choose:
+      - conditions:
+          - "{{ restore_volume }}"
+        sequence:
+          - service: media_player.volume_level
+            target:
+              entity_id: "{{ alexa_device }}"
+            data:
+              volume_level: "{{ volume }}"
+    default:
+      - service: media_player.volume_set
+        target:
+          entity_id: "{{ alexa_device }}"
+        data:
+          volume_level: "{{ volume }}"
+
+  # TTS
+  - service: "{{ notify_entity }}"
+    data:
+      message: !input message_text
+      data:
+        type: tts
+        method: speak
+        lang: "{{ language }}"
+
+  # Возврат громкости
+  - choose:
+      - conditions:
+          - "{{ restore_volume }}"
+        sequence:
+          - delay: 3
+          - service: media_player.volume_set
+            target:
+              entity_id: "{{ alexa_device }}"
+            data:
+              volume_level: "{{ state_attr(alexa_device, 'volume_level') }}"
+
+mode: parallel
+max_exceeded: silent
