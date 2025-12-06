@@ -1,0 +1,853 @@
+title: Home
+views:
+  - theme: Mushroom
+    title: Панель
+    path: panel-1
+    icon: mdi:solar-panel
+    subview: true
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: menu
+              - type: alarm-control-panel
+                entity: alarm_control_panel.home_alarm
+                name: Тревога
+                icon: mdi:shield-off
+                content_info: state
+              - type: weather
+                entity: weather.forecast_home
+                show_temperature: true
+                show_conditions: true
+            alignment: justify
+          - type: custom:mushroom-template-card
+            primary: |-
+              {% set time = now().hour %}
+              {% if (time>=18) %}
+              Добрый вечер, {{user}}!
+              {% elif (time>=12) %}
+              Добрый день, {{user}}!
+              {% elif (time>=5) %}
+              Доброе утро, {{user}}!
+              {% elif (time>=0) %}
+              Доброq ночи, {{user}}!
+              Привет, {{user}}!
+              {% endif  %}
+            secondary: ''
+            icon: ''
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-person-card
+                entity: person.zad1ak
+                icon_type: entity-picture
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/zad
+              - type: custom:mushroom-person-card
+                entity: person.tati
+                fill_container: false
+                icon_type: entity-picture
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/tati
+              - type: custom:mushroom-person-card
+                entity: person.alisa
+                icon_type: entity-picture
+                hold_action:
+                  action: more-info
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/alisa
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Дом
+                secondary: ''
+                icon: mdi:home
+                icon_color: blue
+                layout: vertical
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/home
+              - type: custom:mushroom-template-card
+                primary: Свет
+                secondary: ''
+                icon: mdi:lightbulb
+                icon_color: amber
+                layout: vertical
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/Lights
+              - type: custom:mushroom-template-card
+                primary: Безопасность
+                secondary: ''
+                icon: mdi:shield
+                icon_color: green
+                layout: vertical
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/secure
+              - type: custom:mushroom-template-card
+                primary: Лаб
+                secondary: ''
+                icon: mdi:flask
+                layout: vertical
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/lab
+                icon_color: purple
+              - type: custom:mushroom-template-card
+                primary: Сеть
+                secondary: ''
+                icon: mdi:console-network
+                layout: vertical
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/lan
+                icon_color: red
+          - type: custom:mushroom-title-card
+            title: Комнаты
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Кухоня
+                secondary: '{{ states("sensor.d_t") }}°C'
+                icon: mdi:knife
+                entity: light.svet_kukhnia
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/kitchen
+                hold_action:
+                  action: toggle
+                icon_color: |-
+                  {% if is_state('light.svet_kukhnia' , 'on') %}
+                  orange
+                  {%endif %}
+              - type: custom:mushroom-template-card
+                primary: Зал
+                secondary: '{{ states("sensor.dtv_s_ekranom_temperature") }}°C'
+                icon: mdi:sofa
+                icon_color: |-
+                  {% if is_state('light.svet_zal' , 'on') %}
+                  orange
+                  {%endif %}
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/hall
+                hold_action:
+                  action: toggle
+                entity: light.svet_zal
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Коридор
+                secondary: '{{ states("sensor.koridor_dtv_humidity") }}°C'
+                icon: mdi:doorbell
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/hallway
+                hold_action:
+                  action: toggle
+                entity: light.koridor_la03
+                color: |-
+                  {% if is_state('light.svet_koridor' , 'on') %}
+                  orange
+                  {%endif %}
+                features_position: bottom
+              - type: custom:mushroom-template-card
+                primary: Прихожка
+                secondary: '{{ states("sensor.koridor_dtv_humidity") }}°C'
+                icon: mdi:doorbell-video
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/hallway1
+                hold_action:
+                  action: toggle
+                entity: light.lumi_v3_be13_light
+                color: |-
+                  {% if is_state('light.svet_prikhozhka' , 'on') %}
+                  orange
+                  {%endif %}
+                features_position: bottom
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Ванна
+                secondary: '{{ states("sensor.vanna_dtv_temperature") }}°C'
+                icon: mdi:shower
+                entity: Ванна
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/bath
+                hold_action:
+                  action: toggle
+                color: |-
+                  {% if is_state('light.svet_vanna' , 'on') %}
+                  orange
+                  {%endif %}
+                features_position: bottom
+              - type: custom:mushroom-template-card
+                primary: Туалет
+                secondary: '{{ states("sensor.tualet_dtv_temperature") }}°C'
+                icon: mdi:toilet
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-unknown/toilet
+                hold_action:
+                  action: toggle
+                color: |-
+                  {% if is_state('light.svet_tualet' , 'on') %}
+                  orange
+                  {%endif %}
+                features_position: bottom
+          - type: todo-list
+            entity: todo.shopping_list
+            theme: Mushroom Square
+  - theme: Mushroom
+    title: Кухня
+    path: kitchen
+    icon: mdi:knife
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: back
+              - type: custom:mushroom-title-card
+                title: ''
+                title_tap_action:
+                  action: none
+                subtitle_tap_action:
+                  action: none
+                subtitle: Зал
+                alignment: justify
+          - type: horizontal-stack
+            cards:
+              - hours_to_show: 24
+                graph: line
+                type: sensor
+                entity: sensor.d_t
+                detail: 1
+                unit: C°
+              - hours_to_show: 24
+                graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.d_h
+                unit: '%'
+          - type: media-control
+            entity: media_player.yandex_station_lb0000000000000870020000b329de65
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-light-card
+                icon: mdi:wall-sconce-round
+                show_brightness_control: true
+                use_light_color: true
+                show_color_control: true
+                tap_action:
+                  action: toggle
+                entity: light.kukhnia_vykliuchatel_left
+                name: свет
+              - type: custom:mushroom-light-card
+                icon: mdi:wall-sconce-round
+                show_brightness_control: true
+                use_light_color: true
+                show_color_control: true
+                tap_action:
+                  action: toggle
+                entity: light.kukhnia_vykliuchatel_right
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-light-card
+                icon: mdi:wall-sconce-round
+                show_brightness_control: true
+                use_light_color: true
+                show_color_control: true
+                tap_action:
+                  action: toggle
+                entity: light.wled
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-light-card
+                icon: mdi:wall-sconce-round
+                show_brightness_control: true
+                use_light_color: true
+                show_color_control: true
+                tap_action:
+                  action: toggle
+                entity: light.wled_2
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-light-card
+                icon: mdi:wall-sconce-round
+                show_brightness_control: true
+                use_light_color: true
+                show_color_control: true
+                tap_action:
+                  action: toggle
+                entity: light.stoleshnitsa
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                entities:
+                  - entity: binary_sensor.pir_sensor
+                  - entity: sensor.kukhnia_knopka_action
+                  - entity: switch.usb_switch_1
+                  - entity: binary_sensor.kukhnia_shtorka_konder_contact
+      - type: entities
+        entities:
+          - entity: number.sous_vide_cooking_time
+            name: Время приготовления
+          - entity: switch.sous_vide_start
+            name: Запустить
+          - entity: number.sous_vide_cooking_temperature
+            name: Температура приготовления
+        title: Sous Vide
+  - theme: Backend-selected
+    title: Зал
+    path: hall
+    icon: mdi:sofa
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: back
+              - type: custom:mushroom-title-card
+                title: ''
+                title_tap_action:
+                  action: none
+                subtitle_tap_action:
+                  action: none
+                subtitle: Зал
+                alignment: justify
+          - type: horizontal-stack
+            cards:
+              - graph: line
+                hours_to_show: 24
+                type: sensor
+                entity: sensor.cube_device_temperature
+                detail: 1
+                unit: C°
+              - hours_to_show: 24
+                graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.d_h
+                unit: '%'
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-light-card
+                icon: mdi:wall-sconce-round
+                show_brightness_control: true
+                use_light_color: true
+                show_color_control: true
+                tap_action:
+                  action: toggle
+                entity: light.smart_light
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-light-card
+                icon: mdi:wall-sconce-round
+                show_brightness_control: true
+                use_light_color: true
+                show_color_control: true
+                tap_action:
+                  action: toggle
+                entity: light.esp03
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-light-card
+                icon: mdi:wall-sconce-round
+                show_brightness_control: true
+                use_light_color: true
+                show_color_control: true
+                tap_action:
+                  action: toggle
+                entity: light.zal_vykliuchatel_left
+              - type: custom:mushroom-light-card
+                icon: mdi:wall-sconce-round
+                show_brightness_control: true
+                use_light_color: true
+                show_color_control: true
+                tap_action:
+                  action: toggle
+                entity: light.zal_vykliuchatel_right
+          - type: media-control
+            entity: media_player.yandex_station_ff98f02944f80801c674feff
+          - type: horizontal-stack
+            cards:
+              - type: humidifier
+                entity: humidifier.uvlazhnitel
+                features:
+                  - type: humidifier-toggle
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-vacuum-card
+                entity: vacuum.viomi_v7_6767_robot_cleaner
+          - type: custom:xiaomi-vacuum-map-card
+            map_source:
+              camera: camera.xiaomi_cloud_map_extractor
+            calibration_source:
+              camera: true
+            entity: vacuum.viomi_v7_6767_robot_cleaner
+            vacuum_platform: Xiaomi Miio
+  - theme: Mushroom
+    title: коридор
+    path: hallway
+    icon: mdi:doorbell
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: back
+              - type: custom:mushroom-title-card
+                title: ''
+                title_tap_action:
+                  action: none
+                subtitle_tap_action:
+                  action: none
+                subtitle: Коридор
+                alignment: justify
+          - type: custom:mushroom-light-card
+            entity: light.koridor_la3
+          - type: entities
+            entities:
+              - entity: binary_sensor.koridor_dd_occupancy
+  - theme: Mushroom
+    title: Коридор прихожка
+    path: hallway1
+    icon: mdi:doorbell-video
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: back
+              - type: custom:mushroom-title-card
+                title: ''
+                title_tap_action:
+                  action: none
+                subtitle_tap_action:
+                  action: none
+                subtitle: Прихожка
+                alignment: justify
+          - type: horizontal-stack
+            cards:
+              - graph: line
+                type: sensor
+                entity: sensor.koridor_dtv_temperature
+                detail: 1
+              - graph: line
+                type: sensor
+                entity: sensor.koridor_dtv_humidity
+                detail: 1
+          - type: custom:mushroom-light-card
+            icon: mdi:wall-sconce-round
+            show_brightness_control: true
+            use_light_color: true
+            show_color_control: true
+            tap_action:
+              action: toggle
+            entity: light.unknown_2
+          - type: custom:mushroom-light-card
+            icon: mdi:wall-sconce-round
+            show_brightness_control: true
+            use_light_color: true
+            show_color_control: true
+            tap_action:
+              action: toggle
+            entity: light.shliuz_light
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                entities:
+                  - entity: binary_sensor.prikhozhka_dver_contact
+  - theme: Mushroom
+    title: Ванна
+    path: bath
+    icon: mdi:shower
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: back
+              - type: custom:mushroom-title-card
+                title: ''
+                title_tap_action:
+                  action: none
+                subtitle_tap_action:
+                  action: none
+                subtitle: Ванна
+                alignment: justify
+          - type: horizontal-stack
+            cards:
+              - graph: line
+                type: sensor
+                entity: sensor.vanna_dtv_temperature
+                detail: 1
+              - graph: line
+                type: sensor
+                entity: sensor.vanna_dtv_humidity
+                detail: 1
+          - type: entity
+            entity: binary_sensor.vanna_dpv_water_leak
+            icon: mdi:water
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-light-card
+                icon: mdi:wall-sconce-round
+                show_brightness_control: true
+                use_light_color: true
+                show_color_control: true
+                tap_action:
+                  action: toggle
+                entity: light.vykliuchatel_tualet_vanna_right
+          - type: entity
+            entity: sensor.vanna_rozetka_power
+          - type: tile
+            entity: binary_sensor.vanna_dv_vibration
+            vertical: false
+            features_position: bottom
+  - theme: Mushroom
+    title: Туалет
+    path: toilet
+    icon: mdi:toilet
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: back
+              - type: custom:mushroom-title-card
+                title: ''
+                title_tap_action:
+                  action: none
+                subtitle_tap_action:
+                  action: none
+                subtitle: Туалет
+                alignment: justify
+          - type: horizontal-stack
+            cards:
+              - graph: line
+                type: sensor
+                entity: sensor.tualet_dtv_temperature
+                detail: 1
+              - graph: line
+                type: sensor
+                entity: sensor.tualet_dtv_humidity
+                detail: 1
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-light-card
+                icon: mdi:wall-sconce-round
+                show_brightness_control: true
+                use_light_color: true
+                show_color_control: true
+                tap_action:
+                  action: toggle
+                entity: light.vykliuchatel_tualet_vanna_left
+          - type: horizontal-stack
+            cards:
+              - type: entity
+                entity: binary_sensor.tualet_dpv_water_leak
+          - type: entity
+            entity: binary_sensor.tualet_dp_presence
+  - theme: Mushroom
+    title: Дом
+    path: home
+    icon: mdi:home
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: back
+              - type: custom:mushroom-title-card
+                title: ''
+                title_tap_action:
+                  action: none
+                subtitle_tap_action:
+                  action: none
+                subtitle: Дом
+                alignment: justify
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                entities:
+                  - entity: sensor.redmi_9_battery_level
+                  - entity: sensor.redmi_note_9_pro_battery_level
+                  - entity: sensor.nokia3_battery_level
+          - type: horizontal-stack
+            cards:
+              - alert_classes:
+                  - motion
+                  - moisture
+                sensor_classes:
+                  - temperature
+                  - humidity
+                type: area
+                area: vanna
+                navigation_path: /dashboard-unknown/bath
+                theme: Mushroom Square Shadow
+                show_camera: false
+  - theme: Mushroom
+    title: Свет
+    path: Lights
+    icon: mdi:lightbulb
+    badges: []
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: back
+          - type: custom:mushroom-title-card
+            title: ''
+            title_tap_action:
+              action: none
+            subtitle_tap_action:
+              action: none
+            subtitle: Свет
+            alignment: justify
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-light-card
+            entity: light.svet_kukhnia
+          - type: custom:mushroom-light-card
+            entity: light.svet_zal
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-light-card
+            entity: light.koridor_la3
+          - type: custom:mushroom-light-card
+            entity: light.prikhozhka_la2
+  - theme: Mushroom
+    title: Безопасность
+    path: secure
+    icon: mdi:lock
+    badges: []
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: back
+          - type: custom:mushroom-title-card
+            title: ''
+            title_tap_action:
+              action: none
+            subtitle_tap_action:
+              action: none
+            subtitle: Охрана
+            alignment: justify
+      - type: custom:mushroom-alarm-control-panel-card
+        entity: alarm_control_panel.home_alarm
+        states:
+          - armed_away
+        show_keypad: false
+      - states:
+          - arm_away
+        type: alarm-panel
+        entity: alarm_control_panel.home_alarm
+      - type: entities
+        entities:
+          - entity: binary_sensor.pir_sensor
+          - entity: binary_sensor.dod01_contact
+          - entity: binary_sensor.dd_koridor_occupancy
+          - entity: light.shliuz_light
+          - entity: light.unknown_2
+  - theme: Mushroom
+    icon: mdi:flask
+    title: Лаборатория
+    path: lab
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: back
+              - type: custom:mushroom-title-card
+                title: ''
+                title_tap_action:
+                  action: none
+                subtitle_tap_action:
+                  action: none
+                subtitle: ЛАБА
+                alignment: justify
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                entities:
+                  - entity: update.rpc_shutdown_update
+                  - entity: switch.pc1
+          - type: conditional
+            conditions:
+              - entity: sensor.hacs
+                state_not: '0'
+            card:
+              type: entities
+              entities: []
+              title: Есть обновления
+              theme: Mushroom Square
+              header:
+                type: picture
+                image: >-
+                  https://www.home-assistant.io/images/lovelace/header-footer/balloons-header.png
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                entities:
+                  - entity: sensor.mi_band_7_pro_ble
+                  - entity: sensor.mi_smart_band_5_ble
+                  - entity: sensor.xaomi_note_9_pro_ble
+  - theme: Mushroom
+    title: Сеть
+    path: lan
+    icon: mdi:console-network
+    badges: []
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: back
+          - type: custom:mushroom-title-card
+            title: ''
+            title_tap_action:
+              action: none
+            subtitle_tap_action:
+              action: none
+            subtitle: Сеть
+            alignment: justify
+      - type: entities
+        entities:
+          - entity: sensor.rt_gm_3_external_ip
+          - entity: sensor.rt_gm_3_b_sent
+          - entity: remote.broadlink_rm_pro
+          - entity: sensor.rt_gm_3_kib_s_sent
+          - entity: sensor.speedtest_download
+          - entity: sensor.speedtest_upload
+          - entity: sensor.speedtest_ping
+  - title: zad
+    path: zad
+    subview: false
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: back
+              - type: custom:mushroom-title-card
+                title: ''
+                title_tap_action:
+                  action: none
+                subtitle_tap_action:
+                  action: none
+                subtitle: ''
+                alignment: justify
+          - type: horizontal-stack
+            cards:
+              - type: history-graph
+                entities:
+                  - entity: device_tracker.redmi_note_9_pro
+                  - entity: sensor.redmi_note_9_pro_battery_level
+                  - entity: sensor.redmi_note_9_pro_battery_level
+  - title: tati
+    path: tati
+    subview: false
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: back
+              - type: custom:mushroom-title-card
+                title: ''
+                title_tap_action:
+                  action: none
+                subtitle_tap_action:
+                  action: none
+                subtitle: ''
+                alignment: justify
+          - type: horizontal-stack
+            cards:
+              - type: history-graph
+                entities:
+                  - entity: device_tracker.redmi_9
+                  - entity: sensor.redmi_9_battery_level
+  - title: alisa
+    path: alisa
+    subview: false
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: back
+              - type: custom:mushroom-title-card
+                title: ''
+                title_tap_action:
+                  action: none
+                subtitle_tap_action:
+                  action: none
+                subtitle: ''
+                alignment: justify
+          - type: horizontal-stack
+            cards:
+              - type: history-graph
+                entities:
+                  - entity: device_tracker.nokia3
+                  - entity: sensor.nokia3_battery_level
+  - title: pul
+    path: pul
+    icon: mdi:remote-tv
+    theme: Mushroom
+    type: sidebar
+    cards: []
+    badges: []
