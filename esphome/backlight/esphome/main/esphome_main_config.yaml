@@ -4,34 +4,108 @@
 # Датчики: движение, температура, влажность, освещенность
 # 150+ пресетов WLED-подобных с эффектами
 
+
+
+# Название устройства и тип микроконтроллера
 esphome:
   name: led_controller_advanced
   comment: "Основной пакет с эффектами, пресетами и параметрами"
-
 esp8266:
   board: esp01_1m
 
-# Логи
-logger:
-
-# API для Home Assistant
+# ////////////////////////////////////////
+# ///// начало не изменяемая часть ///////
+# ////////////////////////////////////////
+# Включить ведение журнала
+logger: 
+# Включить API Home Assistant (нужно для подтверждения подключения)
 api:
-  # key: !secret API
-
-# OTA для безопасного обновления
-ota:
-  # password: !secret OTA
+  # key: !secret API 
+ota: 
+  # password: !secret OTA #пароль для обновления по воздуху
   safe_mode: true
-
+ 
+  ap:  # Включить резервную точку доступа (портал авторизации) на случай сбоя подключения к Wi-Fi.
+    ssid: ${name}
+    password: !secret AP # Ннужно добавить пароль в secret
+##настройка статического IP адреса
+  #manual_ip:
+  #  # IP адрес ESP модуля
+  #  static_ip: 192.168.0.151
+  #  # IP адрес можема/роутера
+  #  gateway: 192.168.0.1
+  #  # Маска подсети
+  #  subnet: 255.255.255.0    
 # Веб-сервер
 web_server:
-  port: 80
-  auth:
-    username: !secret web_user
-    password: !secret web_password
+  port: 80 # потрт для подключения
+#  auth:
+#    username: !secret web_user
+#    password: !secret web_password
 
 # Captive portal для аварийного доступа
 captive_portal:
+
+# //////////////////////////
+# конец не изменяемой части
+# //////////////////////////
+# начало изменяемой части
+# //////////////////////////
+# перезагрузка узла
+button:
+  - platform: restart 
+    name: "Перезагрузка"
+    entity_category: config 
+
+text_sensor:
+  - platform: IP адрес
+    ip_address:
+      name: "Device IP"
+
+# Умный ночник с настраиваемой чувствительностью
+binary_sensor:
+  - platform: gpio
+    id: motion_night
+    name: "Ночник"
+    pin:
+      number: GPIO12
+      mode: INPUT_PULLUP
+      inverted: true
+    on_press:
+      - light.turn_on:
+          id: led_strip
+          brightness: 20%
+          transition: 3s
+    on_release:
+      - delay: 30s
+      - light.turn_off:
+          id: led_strip
+          transition: 10s
+
+# Автоматическое применение пресетов по времени суток
+time:
+  - platform: homeassistant
+    id: ha_time
+
+interval:
+  - interval: 60s
+    then:
+      - lambda: |-
+          auto t = id(ha_time).now();
+          if (!t.is_valid()) return;
+          if (t.hour >= 6 && t.hour < 12) {
+            id(preset_1_warm).execute();
+          } else if (t.hour >= 12 && t.hour < 20) {
+            id(preset_25_cool).execute();
+          } else {
+            id(preset_50_pastel).execute();
+          }
+          
+
+# //////////////////////////
+# конец изменяемой части
+# //////////////////////////
+
 
 # Светодиодная лента
 light:
@@ -40,14 +114,14 @@ light:
     name: "LED Strip"
     type: GRB
     pin: 2 # D2 (GPIO2)
-    num_leds: 150
+    num_leds: 300
     variant: WS2812
 
 # Датчики
 binary_sensor:
   - platform: gpio
     id: motion_sensor
-    name: "Motion Sensor"
+    name: "Датчик движения"
     pin:
       number: GPIO14
       mode: INPUT_PULLUP
@@ -64,24 +138,19 @@ sensor:
     pin: D5
     model: DHT22
     temperature:
-      name: "Temperature"
+      name: "Температура"
     humidity:
       name: "Humidity"
     update_interval: 60s
 
   - platform: adc
     pin: A0
-    name: "Ambient Light"
+    name: "Окружающий свет"
     update_interval: 60s
 
   - platform: uptime
-    name: "Uptime"
-    update_interval: 60s
-
-text_sensor:
-  - platform: wifi_info
-    ip_address:
-      name: "Device IP"
+    name: "Время работы"
+    update_interval: 60s # переодичность обновления
 
 # =====================
 # 150+ пресетов
@@ -340,9 +409,8 @@ script:
           effect: "Comet"
 
 
-# =====================
+
 # Автоматическое применение пресетов по времени суток
-# =====================
 time:
   - platform: homeassistant
     id: ha_time
@@ -361,26 +429,9 @@ interval:
             id(preset_50_pastel).execute();
           }
 
-# =====================
-# Умный ночник с настраиваемой чувствительностью
-# =====================
-binary_sensor:
-  - platform: gpio
-    id: motion_night
-    name: "Night Motion"
-    pin:
-      number: GPIO12
-      mode: INPUT_PULLUP
-      inverted: true
-    on_press:
-      - light.turn_on:
-          id: led_strip
-          brightness: 20%
-          transition: 3s
-    on_release:
-      - delay: 30s
-      - light.turn_off:
-          id: led_strip
-          transition: 10s
+
+
+
+
 
 # Конец основного файла
