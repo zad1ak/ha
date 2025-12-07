@@ -39,7 +39,7 @@ light:
     id: led_strip
     name: "LED Strip"
     type: GRB
-    pin: 2
+    pin: 2 #  D2 (GPIO2)
     num_leds: 150
     variant: WS2812
 
