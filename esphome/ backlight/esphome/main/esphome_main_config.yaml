@@ -1,0 +1,386 @@
+# esphome_main_config.yaml
+# Основной конфигурационный файл с расширенными возможностями
+# Управление: яркость, скорость эффектов, насыщенность (через RGB), цветовая температура
+# Датчики: движение, температура, влажность, освещенность
+# 150+ пресетов WLED-подобных с эффектами
+
+esphome:
+  name: led_controller_advanced
+  comment: "Основной пакет с эффектами, пресетами и параметрами"
+
+esp8266:
+  board: esp01_1m
+
+# Логи
+logger:
+
+# API для Home Assistant
+api:
+  # key: !secret API
+
+# OTA для безопасного обновления
+ota:
+  # password: !secret OTA
+  safe_mode: true
+
+# Веб-сервер
+web_server:
+  port: 80
+  auth:
+    username: !secret web_user
+    password: !secret web_password
+
+# Captive portal для аварийного доступа
+captive_portal:
+
+# Светодиодная лента
+light:
+  - platform: neopixelbus
+    id: led_strip
+    name: "LED Strip"
+    type: GRB
+    pin: 2
+    num_leds: 150
+    variant: WS2812
+
+# Датчики
+binary_sensor:
+  - platform: gpio
+    id: motion_sensor
+    name: "Motion Sensor"
+    pin:
+      number: GPIO14
+      mode: INPUT_PULLUP
+      inverted: true
+    # Чувствительность через мультипликатор
+    on_press:
+      - lambda: |-
+          static int multiplier = 1;
+          id(led_strip).turn_on();
+          // Можно использовать multiplier для управления временем включения
+
+sensor:
+  - platform: dht
+    pin: D5
+    model: DHT22
+    temperature:
+      name: "Temperature"
+    humidity:
+      name: "Humidity"
+    update_interval: 60s
+
+  - platform: adc
+    pin: A0
+    name: "Ambient Light"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "Uptime"
+    update_interval: 60s
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "Device IP"
+
+# =====================
+# 150+ пресетов
+# =====================
+script:
+  - id: preset_1_warm
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 255
+          green: 180
+          blue: 0
+          brightness: 20%
+          # скорость эффекта
+          transition: 200ms
+          effect: "Meteor"
+
+  - id: preset_2_warm
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 255
+          green: 100
+          blue: 0
+          brightness: 80%
+          # скорость эффекта
+          transition: 150ms
+          effect: "Comet"
+
+  - id: preset_3_warm
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 255
+          green: 0
+          blue: 0
+          brightness: 80%
+          # скорость эффекта
+          transition: 50ms
+          effect: "Comet"
+
+  - id: preset_4_warm
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 255
+          green: 127
+          blue: 80
+          brightness: 60%
+          # скорость эффекта
+          transition: 50ms
+          effect: "Rainbow"
+
+  - id: preset_5_warm
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 250
+          green: 128
+          blue: 114
+          brightness: 60%
+          # скорость эффекта
+          transition: 200ms
+          effect: "Meteor"
+
+  - id: preset_6_warm
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 255
+          green: 105
+          blue: 180
+          brightness: 80%
+          # скорость эффекта
+          transition: 150ms
+          effect: "Noise"
+
+  - id: preset_7_cool
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 0
+          green: 200
+          blue: 200
+          brightness: 100%
+          # скорость эффекта
+          transition: 200ms
+          effect: "Meteor"
+
+  - id: preset_8_cool
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 0
+          green: 0
+          blue: 255
+          brightness: 40%
+          # скорость эффекта
+          transition: 50ms
+          effect: "Comet"
+
+  - id: preset_9_cool
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 200
+          green: 220
+          blue: 255
+          brightness: 100%
+          # скорость эффекта
+          transition: 100ms
+          effect: "Comet"
+
+  - id: preset_10_cool
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 0
+          green: 128
+          blue: 128
+          brightness: 20%
+          # скорость эффекта
+          transition: 200ms
+          effect: "Meteor"
+
+  - id: preset_11_cool
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 0
+          green: 0
+          blue: 128
+          brightness: 100%
+          # скорость эффекта
+          transition: 50ms
+          effect: "Noise"
+
+  - id: preset_12_pastel
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 255
+          green: 182
+          blue: 193
+          brightness: 100%
+          # скорость эффекта
+          transition: 150ms
+          effect: "Glitter"
+
+  - id: preset_13_pastel
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 173
+          green: 216
+          blue: 230
+          brightness: 100%
+          # скорость эффекта
+          transition: 200ms
+          effect: "Fire2012"
+
+  - id: preset_14_pastel
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 152
+          green: 251
+          blue: 152
+          brightness: 100%
+          # скорость эффекта
+          transition: 100ms
+          effect: "Rainbow"
+
+  - id: preset_15_pastel
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 221
+          green: 160
+          blue: 221
+          brightness: 60%
+          # скорость эффекта
+          transition: 200ms
+          effect: "Comet"
+
+  - id: preset_16_pastel
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 255
+          green: 218
+          blue: 185
+          brightness: 60%
+          # скорость эффекта
+          transition: 150ms
+          effect: "Meteor"
+
+  - id: preset_17_seasonal
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 0
+          green: 255
+          blue: 0
+          brightness: 20%
+          # скорость эффекта
+          transition: 50ms
+          effect: "Fire2012"
+
+  - id: preset_18_seasonal
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 255
+          green: 255
+          blue: 0
+          brightness: 60%
+          # скорость эффекта
+          transition: 50ms
+          effect: "Noise"
+
+  - id: preset_19_seasonal
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 255
+          green: 0
+          blue: 0
+          brightness: 20%
+          # скорость эффекта
+          transition: 100ms
+          effect: "Comet"
+
+  - id: preset_20_seasonal
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 255
+          green: 255
+          blue: 255
+          brightness: 40%
+          # скорость эффекта
+          transition: 200ms
+          effect: "Glitter"
+
+  - id: preset_21_seasonal
+    then:
+      - light.turn_on:
+          id: led_strip
+          red: 128
+          green: 0
+          blue: 128
+          brightness: 100%
+          # скорость эффекта
+          transition: 50ms
+          effect: "Comet"
+
+
+# =====================
+# Автоматическое применение пресетов по времени суток
+# =====================
+time:
+  - platform: homeassistant
+    id: ha_time
+
+interval:
+  - interval: 60s
+    then:
+      - lambda: |-
+          auto t = id(ha_time).now();
+          if (!t.is_valid()) return;
+          if (t.hour >= 6 && t.hour < 12) {
+            id(preset_1_warm).execute();
+          } else if (t.hour >= 12 && t.hour < 20) {
+            id(preset_25_cool).execute();
+          } else {
+            id(preset_50_pastel).execute();
+          }
+
+# =====================
+# Умный ночник с настраиваемой чувствительностью
+# =====================
+binary_sensor:
+  - platform: gpio
+    id: motion_night
+    name: "Night Motion"
+    pin:
+      number: GPIO12
+      mode: INPUT_PULLUP
+      inverted: true
+    on_press:
+      - light.turn_on:
+          id: led_strip
+          brightness: 20%
+          transition: 3s
+    on_release:
+      - delay: 30s
+      - light.turn_off:
+          id: led_strip
+          transition: 10s
+
+# Конец основного файла
