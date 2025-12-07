@@ -1,6 +1,0 @@
-Wiring diagram:
-- Data -> GPIO2
-- 5V -> VCC
-- GND -> GND
-- PIR -> GPIO14
-- DHT22 -> D5
