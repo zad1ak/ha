@@ -1,0 +1,23 @@
+# device_flash_esp32.yaml
+esphome:
+  name: led_device_esp32
+esp32:
+  board: esp32dev
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+api:
+  encryption:
+    key: !secret API
+
+ota:
+  password: !secret OTA
+
+logger:
+
+# Подключаем основной конфиг из GitHub
+packages:
+  common:
+    url: https://raw.githubusercontent.com/USERNAME/ESPHome-LED-Controller-Advanced/main/esphome/main/esphome_main_config.yaml
