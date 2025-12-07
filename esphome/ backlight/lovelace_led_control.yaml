@@ -1,0 +1,11 @@
+type: vertical-stack
+cards:
+  - type: entities
+    title: LED Controller
+    entities:
+      - entity: light.led_strip
+        name: Светодиодная лента
+      - entity: sensor.uptime
+        name: Время работы
+      - entity: sensor.device_ip
+        name: IP адрес
