@@ -20,4 +20,4 @@ logger:
 # Подключаем основной конфиг из GitHub
 packages:
   common:
-    url: https://raw.githubusercontent.com/USERNAME/ESPHome-LED-Controller-Advanced/main/esphome/main/esphome_main_config.yaml
+    url: https://raw.githubusercontent.com/zad1ak/ha/refs/heads/main/esphome/backlight/esphome/main/esphome_main_config.yaml
