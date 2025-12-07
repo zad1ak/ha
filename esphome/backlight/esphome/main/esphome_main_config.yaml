@@ -9,6 +9,7 @@
 # Название устройства и тип микроконтроллера
 esphome:
   name: led_controller_advanced
+  friendly_name: led
   comment: "Основной пакет с эффектами, пресетами и параметрами"
 esp8266:
   board: esp01_1m
@@ -58,7 +59,7 @@ button:
     entity_category: config 
 
 text_sensor:
-  - platform: IP адрес
+  - platform: "${friendly_name} IP адрес"
     ip_address:
       name: "Device IP"
 
@@ -66,7 +67,7 @@ text_sensor:
 binary_sensor:
   - platform: gpio
     id: motion_night
-    name: "Ночник"
+    name: "${friendly_name} Ночник"
     pin:
       number: GPIO12
       mode: INPUT_PULLUP
@@ -87,7 +88,7 @@ binary_sensor:
       number: GPIO0
       mode: INPUT_PULLUP
       inverted: True
-    name: "Кнопка вкл/выкл"
+    name: "${friendly_name} Кнопка вкл/выкл"
     on_press:
         then:
             - light.toggle: led_strip
@@ -121,7 +122,7 @@ interval:
 light:
   - platform: neopixelbus
     id: led_strip
-    name: "LED Strip"
+    name: "${friendly_name} LED Strip"
     type: GRB
     pin: 2 # D2 (GPIO2)
     num_leds: 300
@@ -131,7 +132,7 @@ light:
 binary_sensor:
   - platform: gpio
     id: motion_sensor
-    name: "Датчик движения"
+    name: "${friendly_name} Датчик движения"
     pin:
       number: GPIO14
       mode: INPUT_PULLUP
@@ -148,18 +149,18 @@ sensor:
     pin: D5
     model: DHT22
     temperature:
-      name: "Температура"
+      name: "${friendly_name} Температура"
     humidity:
-      name: "Humidity"
+      name: "${friendly_name} Вложность"
     update_interval: 60s
 
   - platform: adc
     pin: A0
-    name: "Окружающий свет"
+    name: "${friendly_name} Окружающий свет"
     update_interval: 60s
 
   - platform: uptime
-    name: "Время работы"
+    name: "${friendly_name} Время работы"
     update_interval: 60s # переодичность обновления
 
 # =====================
