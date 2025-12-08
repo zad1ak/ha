@@ -1,0 +1,24 @@
+{
+  "name": "Xray VPN Proxy",
+  "version": "1.0.0",
+  "slug": "xray_ha",
+  "description": "Xray (VLESS Reality/TLS) proxy for Home Assistant",
+  "arch": [
+    "aarch64",
+    "amd64",
+    "armv7"
+  ],
+  "startup": "services",
+  "boot": "auto",
+  "ports": {},
+  "ports_description": {},
+  "options": {
+    "vless_url": ""
+  },
+  "schema": {
+    "vless_url": "str"
+  },
+  "webui": "http://[HOST]:[PORT:1080]",
+  "host_network": false,
+  "ingress": false
+}
